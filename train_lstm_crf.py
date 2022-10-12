@@ -11,7 +11,8 @@ from utils import cal_f1_score
 
 # set logging
 log_file_path = "./ckpt/run.log"
-if os.path.exists(log_file_path): os.remove(log_file_path)
+if os.path.exists(log_file_path):
+    os.remove(log_file_path)
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 formatter = logging.Formatter("%(asctime)s | %(message)s", "%Y-%m-%d %H:%M:%S")
@@ -33,26 +34,29 @@ data_processor_train = DataProcessor(
     "./data/train/input.seq.char",
     "./data/train/output.seq.bioattr",
     w2i_char,
-    w2i_bio, 
-    shuffling=True
+    w2i_bio,
+    shuffling=True,
 )
 
 data_processor_valid = DataProcessor(
     "./data/test/input.seq.char",
     "./data/test/output.seq.bioattr",
     w2i_char,
-    w2i_bio, 
-    shuffling=True
+    w2i_bio,
+    shuffling=True,
 )
 
 logger.info("building model...")
 
-model = MyModel(embedding_dim=300,
-                hidden_dim=300,
-                vocab_size_char=len(w2i_char),
-                vocab_size_bio=len(w2i_bio),
-                use_crf=True)
+model = MyModel(
+    embedding_dim=300,
+    hidden_dim=300,
+    vocab_size_char=len(w2i_char),
+    vocab_size_bio=len(w2i_bio),
+    use_crf=True,
+)
 
+# 计算参数总量
 logger.info("model params:")
 params_num_all = 0
 for variable in tf.trainable_variables():
@@ -62,16 +66,16 @@ for variable in tf.trainable_variables():
     params_num_all += params_num
     logger.info("\t {} {} {}".format(variable.name, variable.shape, params_num))
 logger.info("all params num: " + str(params_num_all))
-        
-logger.info("start training...")
 
+logger.info("start training...")
+# GPU 选项, 限制下显存, 不要一下子占完
 tf_config = tf.ConfigProto(allow_soft_placement=True)
 tf_config.gpu_options.allow_growth = True
 
 with tf.Session(config=tf_config) as sess:
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver(max_to_keep=50)
-    
+
     epoches = 0
     losses = []
     batches = 0
@@ -79,31 +83,40 @@ with tf.Session(config=tf_config) as sess:
     batch_size = 32
 
     while epoches < 20:
-        (inputs_seq_batch, 
-         inputs_seq_len_batch,
-         outputs_seq_batch) = data_processor_train.get_batch(batch_size)
-        
+        (
+            inputs_seq_batch,
+            inputs_seq_len_batch,
+            outputs_seq_batch,
+        ) = data_processor_train.get_batch(batch_size)
+
         feed_dict = {
             model.inputs_seq: inputs_seq_batch,
             model.inputs_seq_len: inputs_seq_len_batch,
-            model.outputs_seq: outputs_seq_batch
+            model.outputs_seq: outputs_seq_batch,
         }
-        
-        if batches == 0: 
+
+        # 第一个批次的时候检查下数据
+        if batches == 0:
             logger.info("###### shape of a batch #######")
             logger.info("input_seq: " + str(inputs_seq_batch.shape))
             logger.info("input_seq_len: " + str(inputs_seq_len_batch.shape))
             logger.info("output_seq: " + str(outputs_seq_batch.shape))
             logger.info("###### preview a sample #######")
-            logger.info("input_seq:" + " ".join([i2w_char[i] for i in inputs_seq_batch[0]]))
+            logger.info(
+                "input_seq:" + " ".join([i2w_char[i] for i in inputs_seq_batch[0]])
+            )
             logger.info("input_seq_len :" + str(inputs_seq_len_batch[0]))
-            logger.info("output_seq: " + " ".join([i2w_bio[i] for i in outputs_seq_batch[0]]))
+            logger.info(
+                "output_seq: " + " ".join([i2w_bio[i] for i in outputs_seq_batch[0]])
+            )
             logger.info("###############################")
-        
+
+        # 获取损失
         loss, _ = sess.run([model.loss, model.train_op], feed_dict)
         losses.append(loss)
         batches += 1
-        
+
+        # 一个轮次跑完了, 开始下一个
         if data_processor_train.end_flag:
             data_processor_train.refresh()
             epoches += 1
@@ -112,62 +125,72 @@ with tf.Session(config=tf_config) as sess:
             preds_kvpair = []
             golds_kvpair = []
             batches_sample = 0
-            
+
             while True:
-                (inputs_seq_batch, 
-                 inputs_seq_len_batch,
-                 outputs_seq_batch) = data_processor.get_batch(batch_size)
+                (
+                    inputs_seq_batch,
+                    inputs_seq_len_batch,
+                    outputs_seq_batch,
+                ) = data_processor.get_batch(batch_size)
 
                 feed_dict = {
                     model.inputs_seq: inputs_seq_batch,
                     model.inputs_seq_len: inputs_seq_len_batch,
-                    model.outputs_seq: outputs_seq_batch
+                    model.outputs_seq: outputs_seq_batch,
                 }
 
+                # 预测的序列标签的批次
                 preds_seq_batch = sess.run(model.outputs, feed_dict)
-                
-                for pred_seq, gold_seq, input_seq, l in zip(preds_seq_batch, 
-                                                            outputs_seq_batch, 
-                                                            inputs_seq_batch, 
-                                                            inputs_seq_len_batch):
+
+                for pred_seq, gold_seq, input_seq, l in zip(
+                    preds_seq_batch,
+                    outputs_seq_batch,
+                    inputs_seq_batch,
+                    inputs_seq_len_batch,
+                ):
+                    # 从数字索引转换成标签
                     pred_seq = [i2w_bio[i] for i in pred_seq[:l]]
                     gold_seq = [i2w_bio[i] for i in gold_seq[:l]]
                     char_seq = [i2w_char[i] for i in input_seq[:l]]
                     pred_kvpair = extract_kvpairs_in_bio(pred_seq, char_seq)
                     gold_kvpair = extract_kvpairs_in_bio(gold_seq, char_seq)
-                    
+
                     preds_kvpair.append(pred_kvpair)
                     golds_kvpair.append(gold_kvpair)
-                    
+
                 if data_processor.end_flag:
                     data_processor.refresh()
                     break
-                
+
                 batches_sample += 1
                 if (max_batches is not None) and (batches_sample >= max_batches):
                     break
-            
+
             p, r, f1 = cal_f1_score(preds_kvpair, golds_kvpair)
-            
+
             logger.info("Valid Samples: {}".format(len(preds_kvpair)))
-            logger.info("Valid P/R/F1: {} / {} / {}".format(round(p*100, 2), round(r*100, 2), round(f1*100, 2)))
+            logger.info(
+                "Valid P/R/F1: {} / {} / {}".format(
+                    round(p * 100, 2), round(r * 100, 2), round(f1 * 100, 2)
+                )
+            )
 
             return (p, r, f1)
-            
+
         if batches % 100 == 0:
             logger.info("")
             logger.info("Epoches: {}".format(epoches))
             logger.info("Batches: {}".format(batches))
+            # 报告下平均损失
             logger.info("Loss: {}".format(sum(losses) / len(losses)))
             losses = []
 
             ckpt_save_path = "./ckpt/model.ckpt.batch{}".format(batches)
             logger.info("Path of ckpt: {}".format(ckpt_save_path))
             saver.save(sess, ckpt_save_path)
-            
+
+            # 获取验证集的评测结果, 记录当前最好的效果
             p, r, f1 = valid(data_processor_valid, max_batches=10)
             if f1 > best_f1:
                 best_f1 = f1
                 logger.info("############# best performance now here ###############")
-            
-            
