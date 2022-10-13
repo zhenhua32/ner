@@ -92,8 +92,8 @@ def collate_fn(batch_data, w2i_char=w2i_char, w2i_bio=w2i_bio):
 
 train_dataset = MyDataset(train_input_file, train_output_file, w2i_char, w2i_bio)
 test_dataset = MyDataset(test_input_file, test_output_file, w2i_char, w2i_bio)
-train_dataloader = DataLoader(train_dataset, batch_size=1, shuffle=True, collate_fn=collate_fn)
-test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False, collate_fn=collate_fn)
+train_dataloader = DataLoader(train_dataset, batch_size=128, shuffle=True, collate_fn=collate_fn)
+test_dataloader = DataLoader(test_dataset, batch_size=128, shuffle=False, collate_fn=collate_fn)
 
 
 # 创建模型
@@ -118,9 +118,9 @@ class MyModel(nn.Module):
         batch_size = x.shape[0]
         seq_len = x.shape[1]
         emb = self.embedding(x)
-        h0 = Variable(torch.zeros(2, batch_size, self.hidden_size)).to(device)
-        c0 = Variable(torch.zeros(2, batch_size, self.hidden_size)).to(device)
-        output, (final_hidden_state, final_cell_state) = self.lstm(emb, (h0, c0))
+        # h0 = Variable(torch.zeros(2, batch_size, self.hidden_size)).to(device)
+        # c0 = Variable(torch.zeros(2, batch_size, self.hidden_size)).to(device)
+        output, (final_hidden_state, final_cell_state) = self.lstm(emb)
         output = self.linear(output)
         output = self.softmax(output)
         return output
@@ -132,7 +132,7 @@ model.to(device)
 print(model)
 
 loss_fn = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=1e-3)
+optimizer = optim.Adam(model.parameters(), lr=1e-4)
 
 
 def train(dataloader: DataLoader, model: MyModel, loss_fn: nn.CrossEntropyLoss, optimizer: optim.Adam):
@@ -159,13 +159,13 @@ def train(dataloader: DataLoader, model: MyModel, loss_fn: nn.CrossEntropyLoss, 
         loss.backward()
         optimizer.step()
 
-        if batch % 100 == 0:
+        if batch % 10 == 0:
             loss, current = loss.item(), batch * len(inputs_seq_batch)
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 
 
-epochs = 5
+epochs = 10
 for t in range(epochs):
     print(f"Epoch {t+1}\n-------------------------------")
     train(train_dataloader, model, loss_fn, optimizer)
