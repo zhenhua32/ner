@@ -1,21 +1,22 @@
 import json
 import os
 import time
-
 import sys
+
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import torch.nn.functional as F
+from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
+from torch.autograd import Variable
 
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(root_path)
 sys.path.append(root_path)
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import Dataset
-from torch.utils.data import DataLoader
-from torch.autograd import Variable
 
-from utils import load_vocabulary
+from utils import load_vocabulary, cal_f1_score, extract_kvpairs_in_bio
 
 # 加载词汇表
 vocab_char_path = os.path.join(root_path, "./data/vocab_char.txt")
@@ -75,13 +76,16 @@ def collate_fn(batch_data, w2i_char=w2i_char, w2i_bio=w2i_bio):
     """
     inputs_seq_batch, outputs_seq_batch = map(list, zip(*batch_data))
     inputs_seq_len_batch = [len(x) for x in inputs_seq_batch]
+    # outputs_seq_len_batch = [len(x) for x in outputs_seq_batch]
+    # assert inputs_seq_len_batch == outputs_seq_len_batch
 
     # 获取最大序列长度, 全部填充到同样的长度
     max_seq_len = max(inputs_seq_len_batch)
     for seq in inputs_seq_batch:
         seq.extend([w2i_char["[PAD]"]] * (max_seq_len - len(seq)))
     for seq in outputs_seq_batch:
-        seq.extend([w2i_bio["O"]] * (max_seq_len - len(seq)))
+        # seq.extend([w2i_bio["O"]] * (max_seq_len - len(seq)))
+        seq.extend([-1] * (max_seq_len - len(seq)))
 
     return (
         torch.tensor(inputs_seq_batch),
@@ -112,7 +116,6 @@ class MyModel(nn.Module):
         )
         self.linear = nn.Linear(2 * hidden_size, output_size)
         self.hidden_size = hidden_size
-        self.softmax = nn.Softmax(dim=-1)
 
     def forward(self, x):
         batch_size = x.shape[0]
@@ -122,7 +125,7 @@ class MyModel(nn.Module):
         # c0 = Variable(torch.zeros(2, batch_size, self.hidden_size)).to(device)
         output, (final_hidden_state, final_cell_state) = self.lstm(emb)
         output = self.linear(output)
-        output = self.softmax(output)
+        output = F.softmax(output, dim=-1)
         return output
 
 
@@ -131,8 +134,8 @@ model = MyModel()
 model.to(device)
 print(model)
 
-loss_fn = nn.CrossEntropyLoss()
-optimizer = optim.Adam(model.parameters(), lr=1e-4)
+loss_fn = nn.CrossEntropyLoss(ignore_index=-1, )
+optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
 
 def train(dataloader: DataLoader, model: MyModel, loss_fn: nn.CrossEntropyLoss, optimizer: optim.Adam):
@@ -164,10 +167,52 @@ def train(dataloader: DataLoader, model: MyModel, loss_fn: nn.CrossEntropyLoss, 
             print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
 
 
+def test(dataloader: DataLoader, model: MyModel):
+    model.eval()
+    preds_kvpair = []
+    golds_kvpair = []
 
-epochs = 10
+    with torch.no_grad():
+        for batch, (inputs_seq_batch, outputs_seq_batch, inputs_seq_len_batch) in enumerate(dataloader):
+            inputs_seq_batch = inputs_seq_batch.to(device)
+            outputs_seq_batch = outputs_seq_batch.to(device)
+            inputs_seq_len_batch = inputs_seq_len_batch.to(device)
+            preds_seq_batch = model(inputs_seq_batch).argmax(-1).cpu().numpy()
+
+            inputs_seq_batch = inputs_seq_batch.cpu().numpy()
+            outputs_seq_batch = outputs_seq_batch.cpu().numpy()
+            inputs_seq_len_batch = inputs_seq_len_batch.cpu().numpy()
+
+            for pred_seq, gold_seq, input_seq, l in zip(
+                preds_seq_batch,
+                outputs_seq_batch,
+                inputs_seq_batch,
+                inputs_seq_len_batch,
+            ):
+                # 从数字索引转换成标签
+                # print(l)
+                # print(input_seq)
+                # print(input_seq[:l])
+                pred_seq = [i2w_bio[i] for i in pred_seq[:l]]
+                gold_seq = [i2w_bio[i] for i in gold_seq[:l]]
+                char_seq = [i2w_char[i] for i in input_seq[:l]]
+                pred_kvpair = extract_kvpairs_in_bio(pred_seq, char_seq)
+                gold_kvpair = extract_kvpairs_in_bio(gold_seq, char_seq)
+
+                preds_kvpair.append(pred_kvpair)
+                golds_kvpair.append(gold_kvpair)
+
+        p, r, f1 = cal_f1_score(preds_kvpair, golds_kvpair)
+
+        print(preds_kvpair[:3])
+        print(golds_kvpair[:3])
+        print("Valid Samples: {}".format(len(preds_kvpair)))
+        print("Valid P/R/F1: {} / {} / {}".format(round(p * 100, 2), round(r * 100, 2), round(f1 * 100, 2)))
+
+
+epochs = 100
 for t in range(epochs):
     print(f"Epoch {t+1}\n-------------------------------")
     train(train_dataloader, model, loss_fn, optimizer)
-    # test(test_dataloader, model, loss_fn)
+    test(test_dataloader, model)
 print("Done!")
