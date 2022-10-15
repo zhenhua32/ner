@@ -22,3 +22,22 @@
 所以沿着上述思路，就在一个中文NER任务上做一些实践，写一些模型。都列在下面了，首先是 LSTM-CRF 和 BERT-CRF，然后 Cascade 开头的是几个多任务模型（因为实体类型比较多，把NER拆成两个任务，一个用来识别实体，另一个用来判断实体类型），后面的几个模型里，WLF 指的是 Word Level Feature（即在原本字级别的序列标注任务上加入词级别的表征），WOL 指的是 Weight of Loss（即在loss函数方面通过设置权重来权衡Precision与Recall，以达到提高F1的目的）
 
 ![](https://pic2.zhimg.com/80/v2-3062da7d38adce1213af496239f04bd9_720w.jpg)
+
+
+# 关于数据集
+
+这个原始 git 里的数据集质量不行, 不能用, 只是为了验证代码能跑起来而已. 原作者的知乎文章里也说到了.
+
+> 环境：Python3, Tensorflow1.12
+> 
+> 数据：一个电商场景下商品标题中的实体识别，因为是工作中的数据，并且通过远程监督弱标注的质量也一般，完整数据就不放了。但是我 sample 了一些数据留在 git 里了，为了直接 git clone 完，代码原地就能跑，方便你我他
+
+# 复刻
+
+原始代码是用 Tensorflow1.12 实现的.
+用 pytorch 和 tensorflow 2 重新实现.
+
+先从最简单的开始实现.
+
+- [] BiLSTM
+- [] BiLSTM + CRF
