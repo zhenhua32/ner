@@ -18,6 +18,8 @@ sys.path.append(root_path)
 
 from utils import load_vocabulary, cal_f1_score, extract_kvpairs_in_bio
 
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
 # 加载词汇表
 vocab_char_path = os.path.join(root_path, "./data/vocab_char.txt")
 vocab_bioattr_path = os.path.join(root_path, "./data/vocab_bioattr.txt")
@@ -65,8 +67,11 @@ class MyDataset(Dataset):
         return len(self.inputs_seq)
 
     def __getitem__(self, index):
-        input_seq = self.inputs_seq[index]
-        output_seq = self.outputs_seq[index]
+        """
+        必须要牢记, 返回的数据不能是个引用, 要隔离开, 不然后续的 collate_fn 函数会修改内容
+        """
+        input_seq = self.inputs_seq[index].copy()
+        output_seq = self.outputs_seq[index].copy()
         return input_seq, output_seq
 
 
@@ -76,8 +81,6 @@ def collate_fn(batch_data, w2i_char=w2i_char, w2i_bio=w2i_bio):
     """
     inputs_seq_batch, outputs_seq_batch = map(list, zip(*batch_data))
     inputs_seq_len_batch = [len(x) for x in inputs_seq_batch]
-    # outputs_seq_len_batch = [len(x) for x in outputs_seq_batch]
-    # assert inputs_seq_len_batch == outputs_seq_len_batch
 
     # 获取最大序列长度, 全部填充到同样的长度
     max_seq_len = max(inputs_seq_len_batch)
@@ -99,6 +102,17 @@ test_dataset = MyDataset(test_input_file, test_output_file, w2i_char, w2i_bio)
 train_dataloader = DataLoader(train_dataset, batch_size=128, shuffle=True, collate_fn=collate_fn)
 test_dataloader = DataLoader(test_dataset, batch_size=128, shuffle=False, collate_fn=collate_fn)
 
+# 计算权重
+weight_dict = dict((x, 0) for x in i2w_bio.keys())
+for input_seq, output_seq in train_dataset:
+    for x in output_seq:
+        weight_dict[x] += 1
+print(weight_dict)
+summed = sum(weight_dict.values())
+weights = torch.tensor([x / summed for x in weight_dict.values()]).to(device)
+weights = 1.0 / weights
+print(weights)
+
 
 # 创建模型
 class MyModel(nn.Module):
@@ -118,23 +132,18 @@ class MyModel(nn.Module):
         self.hidden_size = hidden_size
 
     def forward(self, x):
-        batch_size = x.shape[0]
-        seq_len = x.shape[1]
         emb = self.embedding(x)
-        # h0 = Variable(torch.zeros(2, batch_size, self.hidden_size)).to(device)
-        # c0 = Variable(torch.zeros(2, batch_size, self.hidden_size)).to(device)
         output, (final_hidden_state, final_cell_state) = self.lstm(emb)
         output = self.linear(output)
         output = F.softmax(output, dim=-1)
         return output
 
 
-device = "cuda" if torch.cuda.is_available() else "cpu"
 model = MyModel()
 model.to(device)
 print(model)
 
-loss_fn = nn.CrossEntropyLoss(ignore_index=-1, )
+loss_fn = nn.CrossEntropyLoss(ignore_index=-1, weight=weights, reduce="mean")
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
 
@@ -190,9 +199,6 @@ def test(dataloader: DataLoader, model: MyModel):
                 inputs_seq_len_batch,
             ):
                 # 从数字索引转换成标签
-                # print(l)
-                # print(input_seq)
-                # print(input_seq[:l])
                 pred_seq = [i2w_bio[i] for i in pred_seq[:l]]
                 gold_seq = [i2w_bio[i] for i in gold_seq[:l]]
                 char_seq = [i2w_char[i] for i in input_seq[:l]]
