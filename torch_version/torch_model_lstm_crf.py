@@ -21,16 +21,29 @@ from utils import load_vocabulary, cal_f1_score, extract_kvpairs_in_bio
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 # 加载词汇表
-vocab_char_path = os.path.join(root_path, "./data/vocab_char.txt")
-vocab_bioattr_path = os.path.join(root_path, "./data/vocab_bioattr.txt")
+# vocab_char_path = os.path.join(root_path, "./data/vocab_char.txt")
+# vocab_bioattr_path = os.path.join(root_path, "./data/vocab_bioattr.txt")
+# w2i_char, i2w_char = load_vocabulary(vocab_char_path)
+# w2i_bio, i2w_bio = load_vocabulary(vocab_bioattr_path)
+
+# # 创建数据集
+# train_input_file = os.path.join(root_path, "./data/train/input.seq.char")
+# train_output_file = os.path.join(root_path, "./data/train/output.seq.bioattr")
+# test_input_file = os.path.join(root_path, "./data/test/input.seq.char")
+# test_output_file = os.path.join(root_path, "./data/test/output.seq.bioattr")
+
+
+# 新版数据集
+vocab_char_path = os.path.join(root_path, "./data/resume-zh/vocab_char.txt")
+vocab_bioattr_path = os.path.join(root_path, "./data/resume-zh/vocab_bioattr.txt")
 w2i_char, i2w_char = load_vocabulary(vocab_char_path)
 w2i_bio, i2w_bio = load_vocabulary(vocab_bioattr_path)
 
 # 创建数据集
-train_input_file = os.path.join(root_path, "./data/train/input.seq.char")
-train_output_file = os.path.join(root_path, "./data/train/output.seq.bioattr")
-test_input_file = os.path.join(root_path, "./data/test/input.seq.char")
-test_output_file = os.path.join(root_path, "./data/test/output.seq.bioattr")
+train_input_file = os.path.join(root_path, "./data/resume-zh/train.input.seq.char")
+train_output_file = os.path.join(root_path, "./data/resume-zh/train.output.seq.bioattr")
+test_input_file = os.path.join(root_path, "./data/resume-zh/dev.input.seq.char")
+test_output_file = os.path.join(root_path, "./data/resume-zh/dev.output.seq.bioattr")
 
 
 class MyDataset(Dataset):
@@ -210,6 +223,7 @@ def test(dataloader: DataLoader, model: MyModel):
 
         p, r, f1 = cal_f1_score(preds_kvpair, golds_kvpair)
 
+        print("前几行的预测结果和标签: ")
         print(preds_kvpair[:3])
         print(golds_kvpair[:3])
         print("Valid Samples: {}".format(len(preds_kvpair)))
