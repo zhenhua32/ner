@@ -11,7 +11,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
-from torch.autograd import Variable
+from torchcrf import CRF
 
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(root_path)
@@ -31,19 +31,6 @@ torch.backends.cudnn.deterministic = True
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 # 加载词汇表
-# vocab_char_path = os.path.join(root_path, "./data/vocab_char.txt")
-# vocab_bioattr_path = os.path.join(root_path, "./data/vocab_bioattr.txt")
-# w2i_char, i2w_char = load_vocabulary(vocab_char_path)
-# w2i_bio, i2w_bio = load_vocabulary(vocab_bioattr_path)
-
-# # 创建数据集
-# train_input_file = os.path.join(root_path, "./data/train/input.seq.char")
-# train_output_file = os.path.join(root_path, "./data/train/output.seq.bioattr")
-# test_input_file = os.path.join(root_path, "./data/test/input.seq.char")
-# test_output_file = os.path.join(root_path, "./data/test/output.seq.bioattr")
-
-
-# 新版数据集
 vocab_char_path = os.path.join(root_path, "./data/resume-zh/vocab_char.txt")
 vocab_bioattr_path = os.path.join(root_path, "./data/resume-zh/vocab_bioattr.txt")
 w2i_char, i2w_char = load_vocabulary(vocab_char_path)
@@ -130,11 +117,11 @@ weight_dict = dict((x, 0) for x in i2w_bio.keys())
 for input_seq, output_seq in train_dataset:
     for x in output_seq:
         weight_dict[x] += 1
-print(weight_dict)
+print("权重字典: ", weight_dict)
 summed = sum(weight_dict.values())
 weights = torch.tensor([x / summed for x in weight_dict.values()]).to(device)
 weights = 1.0 / weights
-print(weights)
+print("权重: ", weights)
 
 
 # 创建模型
@@ -152,20 +139,30 @@ class MyModel(nn.Module):
             bidirectional=True,
         )
         self.linear = nn.Linear(2 * hidden_size, output_size)
+        self.crf = CRF(output_size, batch_first=True)
         self.hidden_size = hidden_size
 
-    def forward(self, x):
+    def forward(self, x, y=None):
         emb = self.embedding(x)
         output, (final_hidden_state, final_cell_state) = self.lstm(emb)
         output = self.linear(output)
         output = F.softmax(output, dim=-1)
-        return output
+        # 使用 crf
+        if y is not None:
+            # 根据 -1 生成 mask, 类型是 ByteTensor
+            mask = (y != -1).byte()
+            loss = self.crf(output, y, mask=mask)
+            return (output, -1 * loss)
+
+        return (output, None)
 
 
 model = MyModel()
 model.to(device)
 print(model)
 
+# 那用 CRF 的话, 就不用这个损失函数了
+# 这个 ignore_index=-1, 就是前面填充成批次的最大长度的时候, 填充的值
 loss_fn = nn.CrossEntropyLoss(ignore_index=-1, weight=weights, reduction="mean")
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
@@ -177,7 +174,7 @@ def train(dataloader: DataLoader, model: MyModel, loss_fn: nn.CrossEntropyLoss, 
         inputs_seq_batch = inputs_seq_batch.to(device)
         outputs_seq_batch = outputs_seq_batch.to(device)
         inputs_seq_len_batch = inputs_seq_len_batch.to(device)
-        pred = model(inputs_seq_batch)
+        pred, loss = model(inputs_seq_batch, outputs_seq_batch)
         # print("inputs_seq_batch", inputs_seq_batch.shape)
         # print("pred", pred.shape)
         # print("outputs_seq_batch", outputs_seq_batch.shape, outputs_seq_batch.dtype)
@@ -187,7 +184,7 @@ def train(dataloader: DataLoader, model: MyModel, loss_fn: nn.CrossEntropyLoss, 
         # 求损失的时候, 需要形状是 (N, C, other) 的, N 是 batch_size, C 是类别数
         pred = torch.transpose(pred, 1, 2)
         # print("pred", pred.shape, pred.dtype)
-        loss = loss_fn(pred, outputs_seq_batch)
+        # loss = loss_fn(pred, outputs_seq_batch)
 
         # 反向传播
         optimizer.zero_grad()
@@ -209,7 +206,10 @@ def test(dataloader: DataLoader, model: MyModel):
             inputs_seq_batch = inputs_seq_batch.to(device)
             outputs_seq_batch = outputs_seq_batch.to(device)
             inputs_seq_len_batch = inputs_seq_len_batch.to(device)
-            preds_seq_batch = model(inputs_seq_batch).argmax(-1).cpu().numpy()
+            # preds_seq_batch = model(inputs_seq_batch).argmax(-1).cpu().numpy()
+            # 使用 crf 解码
+            pred, _ = model(inputs_seq_batch, outputs_seq_batch)
+            preds_seq_batch = model.crf.decode(pred, mask=(inputs_seq_batch != -1).byte())
 
             inputs_seq_batch = inputs_seq_batch.cpu().numpy()
             outputs_seq_batch = outputs_seq_batch.cpu().numpy()
@@ -240,7 +240,7 @@ def test(dataloader: DataLoader, model: MyModel):
         print("Valid P/R/F1: {} / {} / {}".format(round(p * 100, 2), round(r * 100, 2), round(f1 * 100, 2)))
 
 
-epochs = 10
+epochs = 100
 for t in range(epochs):
     print(f"Epoch {t+1}\n-------------------------------")
     train(train_dataloader, model, loss_fn, optimizer)
