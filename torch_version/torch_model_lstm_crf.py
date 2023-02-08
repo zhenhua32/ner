@@ -2,7 +2,9 @@ import json
 import os
 import time
 import sys
+import random
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -18,6 +20,14 @@ sys.path.append(root_path)
 
 from utils import load_vocabulary, cal_f1_score, extract_kvpairs_in_bio
 
+
+# 固定随机种子
+random.seed(32)
+np.random.seed(32)
+torch.manual_seed(32)
+torch.cuda.manual_seed(32)
+torch.cuda.manual_seed_all(32)
+torch.backends.cudnn.deterministic = True
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 # 加载词汇表
@@ -156,7 +166,7 @@ model = MyModel()
 model.to(device)
 print(model)
 
-loss_fn = nn.CrossEntropyLoss(ignore_index=-1, weight=weights, reduce="mean")
+loss_fn = nn.CrossEntropyLoss(ignore_index=-1, weight=weights, reduction="mean")
 optimizer = optim.Adam(model.parameters(), lr=1e-3)
 
 
@@ -230,7 +240,7 @@ def test(dataloader: DataLoader, model: MyModel):
         print("Valid P/R/F1: {} / {} / {}".format(round(p * 100, 2), round(r * 100, 2), round(f1 * 100, 2)))
 
 
-epochs = 100
+epochs = 10
 for t in range(epochs):
     print(f"Epoch {t+1}\n-------------------------------")
     train(train_dataloader, model, loss_fn, optimizer)

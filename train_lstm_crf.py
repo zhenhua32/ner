@@ -25,11 +25,13 @@ logger.addHandler(fhlr)
 
 logger.info("loading vocab...")
 
+# 词表文件和标签文件
 w2i_char, i2w_char = load_vocabulary("./data/vocab_char.txt")
 w2i_bio, i2w_bio = load_vocabulary("./data/vocab_bioattr.txt")
 
 logger.info("loading data...")
 
+# 输入文件是分成两个的, 一个是输入序列, 一个是输出序列
 data_processor_train = DataProcessor(
     "./data/train/input.seq.char",
     "./data/train/output.seq.bioattr",
@@ -83,12 +85,14 @@ with tf.Session(config=tf_config) as sess:
     batch_size = 32
 
     while epoches < 20:
+        # 获取这一批次的数据
         (
             inputs_seq_batch,
             inputs_seq_len_batch,
             outputs_seq_batch,
         ) = data_processor_train.get_batch(batch_size)
 
+        # 模型的输入字典
         feed_dict = {
             model.inputs_seq: inputs_seq_batch,
             model.inputs_seq_len: inputs_seq_len_batch,
