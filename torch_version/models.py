@@ -1,3 +1,4 @@
+import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchcrf import CRF
@@ -33,10 +34,12 @@ class LSTMModel(nn.Module):
         output, (final_hidden_state, final_cell_state) = self.lstm(emb)
         # output shape: (batch_size, seq_len, output_size)
         output = self.linear(output)
+        # output shape: (batch_size, seq_len, output_size)
         output = F.softmax(output, dim=-1)
         # 如果有 y, 就计算下 loss
         if y is not None:
-            loss = F.cross_entropy(output, y, ignore_index=-1)
+            # 求损失的时候, 需要形状是 (N, C, other) 的, N 是 batch_size, C 是类别数
+            loss = F.cross_entropy(torch.transpose(output, 1, 2), y, ignore_index=-1)
             return (output, loss)
 
         return (output, None)

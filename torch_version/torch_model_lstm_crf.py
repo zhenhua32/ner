@@ -13,6 +13,12 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 from torchcrf import CRF
 
+
+"""
+该文件是单独使用的, 不依赖其他文件
+"""
+
+
 root_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 print(root_path)
 sys.path.append(root_path)
