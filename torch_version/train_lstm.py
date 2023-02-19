@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 
 from utils_tools import load_vocabulary
 from data_tools import set_seed, MyDataset, padding_to_batch_max_len
-from models import LSTMModel, LSTMCRFModel
+from lstm_models import LSTMModel, LSTMCRFModel
 from lstm_train_step import train, test
 
 

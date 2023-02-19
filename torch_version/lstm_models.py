@@ -28,6 +28,7 @@ class LSTMModel(nn.Module):
 
     def forward(self, x, y=None):
         # x shape: (batch_size, seq_len)
+        # y shape: (batch_size, seq_len)
         # emb shape: (batch_size, seq_len, embedding_dim)
         emb = self.embedding(x)
         # output shape: (batch_size, seq_len, 2 * hidden_size)
