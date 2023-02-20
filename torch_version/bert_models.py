@@ -10,9 +10,9 @@ class BertNerModel(nn.Module):
     ner 的 bert 模型
     """
 
-    def __init__(self, output_size: int) -> None:
+    def __init__(self, output_size: int, bert_path) -> None:
         super().__init__()
-        self.bert = BertModel.from_pretrained("bert-base-chinese")
+        self.bert = BertModel.from_pretrained(bert_path)
         self.bert_config: BertConfig = self.bert.config
         self.linear = nn.Linear(self.bert_config.hidden_size, output_size)
 

@@ -44,6 +44,7 @@ if use_crf:
 else:
     model = BertNerModel(
         output_size=len(w2i_bio),
+        bert_path=bert_path,
     )
 model.to(device)
 print(model)
