@@ -7,7 +7,7 @@ from transformers import AutoTokenizer
 
 from utils_tools import load_vocabulary
 from data_tools import set_seed, BertDataset
-from bert_models import BertNerModel
+from bert_models import BertNerModel, BertNerCRFModel
 from bert_train_step import train, test
 
 
@@ -31,16 +31,18 @@ tokenizer = AutoTokenizer.from_pretrained(bert_path)
 collate_fn = None
 train_dataset = BertDataset(train_input_file, train_output_file, w2i_bio, bert_path, max_length=64)
 test_dataset = BertDataset(test_input_file, test_output_file, w2i_bio, bert_path, max_length=64)
-train_dataloader = DataLoader(train_dataset, batch_size=128, shuffle=True, collate_fn=collate_fn)
-test_dataloader = DataLoader(test_dataset, batch_size=128, shuffle=False, collate_fn=collate_fn)
+train_dataloader = DataLoader(train_dataset, batch_size=256, shuffle=True, collate_fn=collate_fn)
+test_dataloader = DataLoader(test_dataset, batch_size=256, shuffle=False, collate_fn=collate_fn)
 
 
 # flag
-use_crf = False
+use_crf = True
 
 if use_crf:
-    # TODO: 还没写完
-    exit()
+    model = BertNerCRFModel(
+        output_size=len(w2i_bio),
+        bert_path=bert_path,
+    )
 else:
     model = BertNerModel(
         output_size=len(w2i_bio),

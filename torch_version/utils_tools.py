@@ -42,7 +42,7 @@ def extract_kvpairs_in_bio(bio_seq: list, word_seq: list):
     word_seq: 单词的数组
     抽取 ner 标签
     """
-    assert len(bio_seq) == len(word_seq)
+    assert len(bio_seq) == len(word_seq), (len(bio_seq), len(word_seq), bio_seq, word_seq)
     pairs = set()  # 是 (标签, 文本) 的集合
     pre_bio = "O"  # 上一个标签
     v = ""  # 当前的文本

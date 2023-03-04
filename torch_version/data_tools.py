@@ -177,7 +177,7 @@ class BertDataset(Dataset):
     @staticmethod
     def tokenize_and_align_labels(tokenized_inputs: BatchEncoding, outputs_seq: list):
         """
-        返回一个对齐后的标签序列
+        返回一个对齐后的标签序列, 这是为训练使用的
         outputs_seq: 标签序列
         """
         labels = []

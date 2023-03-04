@@ -8,7 +8,8 @@ class LSTMModel(nn.Module):
     """
     ner 的 lstm 模型
     """
-    def __init__(self, num_embeddings, output_size, embedding_dim=300, hidden_size=300) -> None:
+
+    def __init__(self, num_embeddings: int, output_size: int, embedding_dim: int = 300, hidden_size: int = 300) -> None:
         """
         num_embeddings: 词汇表的大小
         output_size: 输出的标签的个数
@@ -59,7 +60,8 @@ class LSTMCRFModel(nn.Module):
     """
     在 LSTMModel 的基础上加入 CRF
     """
-    def __init__(self, num_embeddings, output_size, embedding_dim=300, hidden_size=300) -> None:
+
+    def __init__(self, num_embeddings: int, output_size: int, embedding_dim=300, hidden_size=300) -> None:
         """
         num_embeddings: 词汇表的大小
         output_size: 输出的标签的个数
