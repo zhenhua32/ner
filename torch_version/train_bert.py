@@ -36,7 +36,7 @@ test_dataloader = DataLoader(test_dataset, batch_size=256, shuffle=False, collat
 
 
 # flag
-use_crf = True
+use_crf = False
 
 if use_crf:
     model = BertNerCRFModel(
@@ -51,7 +51,13 @@ else:
 model.to(device)
 print(model)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-5)
+bert_params = [param for name, param in model.named_parameters() if "bert" in name]
+other_params = [param for name, param in model.named_parameters() if "bert" not in name]
+
+optimizer = torch.optim.AdamW([
+    {'params': bert_params, 'lr': 5e-5},
+    {'params': other_params, 'lr': 1e-3},
+])
 
 epochs = 100
 best_f1 = 0

@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchcrf import CRF
-from transformers import AutoTokenizer, BertModel, BertConfig
+from transformers import AutoTokenizer, BertModel, BertConfig, BertForTokenClassification
 
 
 class BertNerModel(nn.Module):
@@ -18,6 +18,7 @@ class BertNerModel(nn.Module):
         super().__init__()
         self.bert = BertModel.from_pretrained(bert_path)
         self.bert_config: BertConfig = self.bert.config
+        self.dropout = nn.Dropout(0.1)
         self.linear = nn.Linear(self.bert_config.hidden_size, output_size)
 
     def forward(self, input_ids, attention_mask, token_type_ids, labels=None):
@@ -33,9 +34,9 @@ class BertNerModel(nn.Module):
 
         # sequence_output shape: (batch_size, seq_len, hidden_size)
         sequence_output = output[0]
+        sequence_output = self.dropout(sequence_output)
         # logits shape: (batch_size, seq_len, output_size)
         logits = self.linear(sequence_output)
-        logits = F.softmax(logits, dim=-1)
 
         if labels is not None:
             # loss shape: (1,)
@@ -69,6 +70,7 @@ class BertNerCRFModel(nn.Module):
         super().__init__()
         self.bert = BertModel.from_pretrained(bert_path)
         self.bert_config: BertConfig = self.bert.config
+        self.dropout = nn.Dropout(0.1)
         self.linear = nn.Linear(self.bert_config.hidden_size, output_size)
         self.crf = CRF(output_size, batch_first=True)
 
@@ -85,10 +87,9 @@ class BertNerCRFModel(nn.Module):
 
         # sequence_output shape: (batch_size, seq_len, hidden_size)
         sequence_output = output[0]
-
+        sequence_output = self.dropout(sequence_output)
         # logits shape: (batch_size, seq_len, output_size)
         logits = self.linear(sequence_output)
-        logits = F.softmax(logits, dim=-1)
 
         if labels is not None:
             # loss shape: (1,)
@@ -96,3 +97,12 @@ class BertNerCRFModel(nn.Module):
             return (logits, loss)
 
         return (logits, None)
+
+    def predict(self, input_ids, attention_mask, token_type_ids, return_numpy=False):
+        logits, _ = self.forward(input_ids, attention_mask, token_type_ids)
+        # logits shape: (batch_size, seq_len, output_size)
+        # pred shape: (batch_size, seq_len)
+        pred = self.crf.decode(logits, attention_mask.bool())
+        if return_numpy:
+            return pred.detach().cpu().numpy()
+        return pred
