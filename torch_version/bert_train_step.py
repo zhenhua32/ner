@@ -1,10 +1,10 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
 from transformers import AutoTokenizer, BertTokenizer
-
-from utils_tools import extract_kvpairs_in_bio, cal_f1_score
+from utils_tools import cal_f1_score, extract_kvpairs_in_bio
 
 
 def train(
@@ -26,10 +26,11 @@ def train(
         token_type_ids = token_type_ids.to(device)
         inputs_seq_len = inputs_seq_len.to(device)
         output_seq = output_seq.to(device)
+
+        optimizer.zero_grad()
         pred, loss = model(input_ids, attention_mask, token_type_ids, output_seq)
 
         # 反向传播
-        optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
@@ -67,10 +68,11 @@ def test(
                 # 使用 crf 解码
                 pred, _ = model(input_ids, attention_mask, token_type_ids, output_seq)
                 # 这里是 0, 表示 padding 的位置
-                preds_seq_batch = model.crf.decode(pred, mask=attention_mask.byte())
+                pred_seq_batch = model.crf.decode(pred, mask=attention_mask.bool())
+                # pred_seq_batch 是个列表, 且每个元素的长度不一样的, 因为使用了 mask
             else:
                 pred, _ = model(input_ids, attention_mask, token_type_ids, output_seq)
-                preds_seq_batch = pred.argmax(-1).cpu().numpy()
+                pred_seq_batch = pred.argmax(-1).cpu().numpy()
 
             input_ids = input_ids.cpu().numpy()
             attention_mask = attention_mask.cpu().numpy()
@@ -79,21 +81,27 @@ def test(
             output_seq = output_seq.cpu().numpy()
 
             for pred_seq, gold_seq, input_seq, l in zip(
-                preds_seq_batch,
+                pred_seq_batch,
                 output_seq,
                 input_ids,
                 inputs_seq_len,
             ):
-                # 从数字索引转换成标签
+                # 从数字索引转换成标签, -100 的是无效标签. 这是 numpy, 直接索引就行
+                pred_seq = np.array(pred_seq)
+                valid_index = gold_seq != -100
+                # breakpoint()
+                # 当使用 crf 时, 已经使用 mask 了, 但是用的是 attention_mask, 这里需要去掉首尾的两个标签
+                if use_crf:
+                    pred_seq = pred_seq[1:-1]
+                else:
+                    pred_seq = pred_seq[valid_index]
+                gold_seq = gold_seq[valid_index]
+
                 pred_seq = [i2w_bio[i] for i in pred_seq]
                 gold_seq = [i2w_bio[i] for i in gold_seq]
                 # 从 id 转换成 tokens
                 char_seq = tokenizer.convert_ids_to_tokens(input_seq)
-                # 以 [SEP] 为界限, 只需要前面的部分. 同时去掉第一个字符 [CLS]
-                sep_index = char_seq.index("[SEP]")
-                pred_seq = pred_seq[1:sep_index]
-                gold_seq = gold_seq[1:sep_index]
-                char_seq = char_seq[1:sep_index]
+                char_seq = np.array(char_seq)[valid_index]
 
                 # TODO: 这里需要验证下
                 pred_kvpair = extract_kvpairs_in_bio(pred_seq, char_seq)

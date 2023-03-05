@@ -181,6 +181,8 @@ class BertDataset(Dataset):
         outputs_seq: 标签序列
         """
         labels = []
+        # 对齐标签时, 将无效的位置设置为该值
+        special_token_id = -100
         for i, label in enumerate(outputs_seq):
             # 获取每个 token 对应的单词索引, 因为 bert 的分词可能会把一个单词分成多个 token, 比如 "apple" -> "app", "##le
             word_ids = tokenized_inputs.word_ids(batch_index=i)
@@ -188,17 +190,19 @@ class BertDataset(Dataset):
             previous_word_idx = None
             # 新的标签序列
             label_ids = []
-            # Set the special tokens to 0
+            # Set the special tokens to special token id
             for word_idx in word_ids:
                 # Node 的就是特殊 token, 比如开头的 [CLS], 结尾的 [SEP]
                 if word_idx is None:
-                    label_ids.append(0)
+                    label_ids.append(special_token_id)
                 # 如果当前 token 对应的单词索引和上一个不同, 说明是一个新的单词, 那么就把当前的标签加入到新的标签序列中
                 elif word_idx != previous_word_idx:
                     label_ids.append(label[word_idx])
                 # 否则就是一个单词的多个 token, 那么也是当作特殊 token 处理
                 else:
-                    label_ids.append(0)
+                    # 这里有两种选择, 即可以当作特殊 token 处理, 也可以当作上一个 token 的标签
+                    label_ids.append(label[word_idx])
+                    # label_ids.append(special_token_id)
                 previous_word_idx = word_idx
             labels.append(label_ids)
 

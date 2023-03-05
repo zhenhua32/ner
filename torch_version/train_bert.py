@@ -29,14 +29,14 @@ test_output_file = os.path.join(root_path, "./data/resume-zh/dev.output.seq.bioa
 bert_path = r"D:\code\pretrain_model_dir\bert-base-chinese"
 tokenizer = AutoTokenizer.from_pretrained(bert_path)
 collate_fn = None
-train_dataset = BertDataset(train_input_file, train_output_file, w2i_bio, bert_path, max_length=64)
-test_dataset = BertDataset(test_input_file, test_output_file, w2i_bio, bert_path, max_length=64)
-train_dataloader = DataLoader(train_dataset, batch_size=256, shuffle=True, collate_fn=collate_fn)
-test_dataloader = DataLoader(test_dataset, batch_size=256, shuffle=False, collate_fn=collate_fn)
+train_dataset = BertDataset(train_input_file, train_output_file, w2i_bio, bert_path, max_length=192)
+test_dataset = BertDataset(test_input_file, test_output_file, w2i_bio, bert_path, max_length=192)
+train_dataloader = DataLoader(train_dataset, batch_size=64, shuffle=True, collate_fn=collate_fn)
+test_dataloader = DataLoader(test_dataset, batch_size=64, shuffle=False, collate_fn=collate_fn)
 
 
 # flag
-use_crf = False
+use_crf = True
 
 if use_crf:
     model = BertNerCRFModel(

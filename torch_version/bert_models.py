@@ -41,7 +41,7 @@ class BertNerModel(nn.Module):
         if labels is not None:
             # loss shape: (1,)
             loss = F.cross_entropy(
-                logits.view(-1, logits.shape[-1]), labels.view(-1), ignore_index=-1
+                logits.view(-1, logits.shape[-1]), labels.view(-1), ignore_index=-100
             )
             return (logits, loss)
 
@@ -93,7 +93,11 @@ class BertNerCRFModel(nn.Module):
 
         if labels is not None:
             # loss shape: (1,)
-            loss = -self.crf(logits, labels, attention_mask.bool())
+            # TODO: 还在想着怎么把 -100 的位置去掉
+            labels_mask = labels == -100
+            temp_labels = torch.clone(labels)
+            temp_labels[labels_mask] = 0
+            loss = -self.crf(logits, temp_labels, mask=attention_mask.bool())
             return (logits, loss)
 
         return (logits, None)
