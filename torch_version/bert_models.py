@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -41,7 +42,9 @@ class BertNerModel(nn.Module):
         if labels is not None:
             # loss shape: (1,)
             loss = F.cross_entropy(
-                logits.view(-1, logits.shape[-1]), labels.view(-1), ignore_index=-100
+                logits.view(-1, logits.shape[-1]),
+                labels.view(-1),
+                ignore_index=-100,
             )
             return (logits, loss)
 
@@ -108,5 +111,5 @@ class BertNerCRFModel(nn.Module):
         # pred shape: (batch_size, seq_len)
         pred = self.crf.decode(logits, attention_mask.bool())
         if return_numpy:
-            return pred.detach().cpu().numpy()
-        return pred
+            return np.array(pred)
+        return torch.tensor(pred)

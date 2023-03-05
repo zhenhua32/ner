@@ -1,3 +1,4 @@
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -100,11 +101,13 @@ class LSTMCRFModel(nn.Module):
 
         return (output, None)
 
-    def predict(self, x):
+    def predict(self, x, return_numpy=False):
         output, _ = self.forward(x)
         # output shape: (batch_size, seq_len, output_size)
         # pred shape: (batch_size, seq_len)
         mask = (x != -1).byte()
         # 使用 crf 解码
         pred = self.crf.decode(output, mask=mask)
-        return pred
+        if return_numpy:
+            return np.array(pred)
+        return torch.tensor(pred)
