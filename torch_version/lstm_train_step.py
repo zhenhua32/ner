@@ -23,10 +23,11 @@ def train(
         inputs_seq_batch = inputs_seq_batch.to(device)
         outputs_seq_batch = outputs_seq_batch.to(device)
         inputs_seq_len_batch = inputs_seq_len_batch.to(device)
+
+        optimizer.zero_grad()
         pred, loss = model(inputs_seq_batch, outputs_seq_batch)
 
         # 反向传播
-        optimizer.zero_grad()
         loss.backward()
         optimizer.step()
 
