@@ -37,7 +37,7 @@ test_dataloader = DataLoader(test_dataset, batch_size=128, shuffle=False, collat
 weights = calc_weight_dict(train_dataset, i2w_bio, device)
 
 # flag
-use_crf = False
+use_crf = True
 
 if use_crf:
     model = LSTMCRFModel(
@@ -68,13 +68,23 @@ optimizer = torch.optim.Adam(model.parameters(), lr=5e-3)
 #     num_training_steps=max_train_steps,
 #     num_cycles=2,
 # )
-# 对于 lstm 来说, 不需要 warmup, 第一个 epoch 就比较高了
-scheduler = transformers.get_cosine_schedule_with_warmup(
-    optimizer=optimizer,
-    num_warmup_steps=0,
-    num_training_steps=max_train_steps,
-    num_cycles=0.5,
-)
+if use_crf:
+    # crf 的起步也太慢了, 第一轮的结果就比较差
+    # scheduler = transformers.get_cosine_schedule_with_warmup(
+    #     optimizer=optimizer,
+    #     num_warmup_steps=0,
+    #     num_training_steps=max_train_steps,
+    #     num_cycles=0.5,
+    # )
+    scheduler = None
+else:
+    # 对于 lstm 来说, 不需要 warmup, 第一个 epoch 就比较高了
+    scheduler = transformers.get_cosine_schedule_with_warmup(
+        optimizer=optimizer,
+        num_warmup_steps=0,
+        num_training_steps=max_train_steps,
+        num_cycles=0.5,
+    )
 
 best_f1 = 0
 for t in range(epochs):
@@ -88,6 +98,7 @@ for t in range(epochs):
         torch.save(model.state_dict(), model_path)
         best_f1 = f1
     # 在每轮结束后调整学习率
-    scheduler.step()
+    if scheduler is not None:
+        scheduler.step()
 print("Done!")
 print("best_f1: ", best_f1)
