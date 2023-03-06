@@ -3,7 +3,7 @@ from functools import partial
 
 import torch
 from torch.utils.data import DataLoader
-
+import transformers
 
 from utils_tools import load_vocabulary
 from data_tools import set_seed, LSTMDataset, padding_to_batch_max_len, calc_weight_dict
@@ -52,14 +52,30 @@ else:
         output_size=len(w2i_bio),
         embedding_dim=300,
         hidden_size=300,
-        weights=weights,
+        weights=weights,  # 加了权重起步快, 但在 100 轮后结果更差些
     )
 model.to(device)
 print(model)
 
-optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+epochs = 20
+max_train_steps = epochs * len(train_dataloader)
+lr_warmup_steps = max_train_steps // 20
 
-epochs = 10
+optimizer = torch.optim.Adam(model.parameters(), lr=5e-3)
+# scheduler = transformers.get_cosine_with_hard_restarts_schedule_with_warmup(
+#     optimizer=optimizer,
+#     num_warmup_steps=lr_warmup_steps,
+#     num_training_steps=max_train_steps,
+#     num_cycles=2,
+# )
+# 对于 lstm 来说, 不需要 warmup, 第一个 epoch 就比较高了
+scheduler = transformers.get_cosine_schedule_with_warmup(
+    optimizer=optimizer,
+    num_warmup_steps=0,
+    num_training_steps=max_train_steps,
+    num_cycles=0.5,
+)
+
 best_f1 = 0
 for t in range(epochs):
     print(f"Epoch {t+1}\n-------------------------------")
@@ -71,5 +87,7 @@ for t in range(epochs):
         model_path = os.path.join(root_path, f"./ckpt/{model_file_name}")
         torch.save(model.state_dict(), model_path)
         best_f1 = f1
+    # 在每轮结束后调整学习率
+    scheduler.step()
 print("Done!")
 print("best_f1: ", best_f1)
