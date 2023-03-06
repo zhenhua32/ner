@@ -20,6 +20,30 @@ def set_seed():
     torch.backends.cudnn.benchmark = False
 
 
+def load_csv_file(input_seq_path: str, output_seq_path: str = None):
+    """
+    支持两种格式, 一种是将 input 和 output 放在一起, 一种是分开的
+    """
+    inputs_seq = []
+    outputs_seq = []
+
+    if output_seq_path is None:
+        with open(input_seq_path, "r", encoding="utf-8") as f:
+            for line in f:
+                text, label = line.strip().split("\t")
+                inputs_seq.append(text.split(" "))
+                outputs_seq.append(label.split(" "))
+    else:
+        with open(input_seq_path, "r", encoding="utf-8") as f:
+            for line in f:
+                inputs_seq.append(line.strip().split(" "))
+        with open(output_seq_path, "r", encoding="utf-8") as f:
+            for line in f:
+                outputs_seq.append(line.strip().split(" "))
+
+    return inputs_seq, outputs_seq
+
+
 class LSTMDataset(Dataset):
     """
     LSTM 用的词表是直接映射的. 目前看 data/vocab_char.txt 也是小写的
@@ -38,21 +62,11 @@ class LSTMDataset(Dataset):
         print("加载 ", input_seq_path)
         print("加载 ", output_seq_path)
 
-        inputs_seq = []
-        with open(input_seq_path, "r", encoding="utf-8") as f:
-            for line in f.read().strip().split("\n"):
-                # 按行处理, 将里面的单词替换成单词索引
-                if do_lower:
-                    line = line.lower()
-                seq = [w2i_char[word] if word in w2i_char else w2i_char["[UNK]"] for word in line.split(" ")]
-                inputs_seq.append(seq)
+        inputs_seq, outputs_seq = load_csv_file(input_seq_path, output_seq_path)
 
-        outputs_seq = []
-        with open(output_seq_path, "r", encoding="utf-8") as f:
-            for line in f.read().strip().split("\n"):
-                # 同上, 将标签也替换成索引
-                seq = [w2i_bio[word] for word in line.split(" ")]
-                outputs_seq.append(seq)
+        # 转换成 id 格式
+        inputs_seq = [[w2i_char[word] if word in w2i_char else w2i_char["[UNK]"] for word in seq] for seq in inputs_seq]
+        outputs_seq = [[w2i_bio[word] for word in seq] for seq in outputs_seq]
 
         # 简单验证下数据, 总行数要相同, 每行的单词数也要相同
         print("行数", len(inputs_seq), len(outputs_seq))
@@ -111,6 +125,7 @@ def calc_weight_dict(train_dataset: Dataset, i2w_bio: dict, device: torch.device
     weights = torch.tensor([x / summed for x in weight_dict.values()]).to(device)
     weights = 1.0 / weights
     print("权重: ", weights)
+    return weights
 
 
 class BertDataset(Dataset):
