@@ -100,7 +100,7 @@ class LSTMCRFModel(nn.Module):
             # 根据 -1 生成 mask, 类型是 ByteTensor
             mask = (y != -1).byte()
             # crf 的 loss 是负的
-            loss = self.crf(output, y, mask=mask)
+            loss = self.crf(output, y, mask=mask, reduction="mean")
             return (output, -1 * loss)
 
         return (output, None)

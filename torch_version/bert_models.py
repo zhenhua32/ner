@@ -100,7 +100,7 @@ class BertNerCRFModel(nn.Module):
             labels_mask = labels == -100
             temp_labels = torch.clone(labels)
             temp_labels[labels_mask] = 0
-            loss = -self.crf(logits, temp_labels, mask=attention_mask.bool())
+            loss = -self.crf(logits, temp_labels, mask=attention_mask.bool(), reduction="mean")
             return (logits, loss)
 
         return (logits, None)
