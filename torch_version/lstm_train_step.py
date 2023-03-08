@@ -25,10 +25,15 @@ def train(
         inputs_seq_len_batch = inputs_seq_len_batch.to(device)
 
         optimizer.zero_grad()
-        pred, loss = model(inputs_seq_batch, outputs_seq_batch)
+
+        # 混合精度训练
+        with torch.autocast(device):
+            pred, loss = model(inputs_seq_batch, outputs_seq_batch)
 
         # 反向传播
         loss.backward()
+        # 梯度裁剪
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
         optimizer.step()
 
         if batch % 10 == 0:
@@ -59,13 +64,14 @@ def test(
             outputs_seq_batch = outputs_seq_batch.to(device)
             inputs_seq_len_batch = inputs_seq_len_batch.to(device)
 
-            if use_crf:
-                # 使用 crf 解码
-                pred, _ = model(inputs_seq_batch, outputs_seq_batch)
-                preds_seq_batch = model.crf.decode(pred, mask=(inputs_seq_batch != -1).byte())
-            else:
-                pred, _ = model(inputs_seq_batch, outputs_seq_batch)
-                preds_seq_batch = pred.argmax(-1).cpu().numpy()
+            with torch.autocast(device):
+                if use_crf:
+                    # 使用 crf 解码
+                    pred, _ = model(inputs_seq_batch, outputs_seq_batch)
+                    preds_seq_batch = model.crf.decode(pred, mask=(inputs_seq_batch != -1).byte())
+                else:
+                    pred, _ = model(inputs_seq_batch, outputs_seq_batch)
+                    preds_seq_batch = pred.argmax(-1).cpu().numpy()
 
             inputs_seq_batch = inputs_seq_batch.cpu().numpy()
             outputs_seq_batch = outputs_seq_batch.cpu().numpy()
