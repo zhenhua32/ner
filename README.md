@@ -44,4 +44,8 @@
 
 # 导出成 onnx 模型
 
+```bash
 python -m tf2onnx.convert --checkpoint model.ckpt.batch8.meta --output model.onnx --inputs inputs_seq:0,inputs_seq_len:0 --outputs projection/dense/kernel:0
+```
+
+环境变量 LD_LIBRARY_PATH 是动态库查找的路径.
