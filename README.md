@@ -67,3 +67,53 @@ strings /usr/lib/libstdc++.so.6 | grep CXXABI
 strings /usr/lib64/libstdc++.so.6 | grep CXXABI
 # 可以检查下这几个路径下的
 ```
+
+导出时有报错, 完整的日志如下:
+
+```log
+rojection/transitions:0,projection/Softmax:0,projection/cond_2/ReverseSequence_1:0
+C:\Anaconda3\envs\ner\lib\site-packages\tensorflow\python\framework\dtypes.py:526: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_qint8 = np.dtype([("qint8", np.int8, 1)])
+C:\Anaconda3\envs\ner\lib\site-packages\tensorflow\python\framework\dtypes.py:527: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_quint8 = np.dtype([("quint8", np.uint8, 1)])
+C:\Anaconda3\envs\ner\lib\site-packages\tensorflow\python\framework\dtypes.py:528: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_qint16 = np.dtype([("qint16", np.int16, 1)])
+C:\Anaconda3\envs\ner\lib\site-packages\tensorflow\python\framework\dtypes.py:529: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_quint16 = np.dtype([("quint16", np.uint16, 1)])
+C:\Anaconda3\envs\ner\lib\site-packages\tensorflow\python\framework\dtypes.py:530: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  _np_qint32 = np.dtype([("qint32", np.int32, 1)])
+C:\Anaconda3\envs\ner\lib\site-packages\tensorflow\python\framework\dtypes.py:535: FutureWarning: Passing (type, 1) or '1type' as a synonym of type is deprecated; in a future version of numpy, it will be understood as (type, (1,)) / '(1,)type'.
+  np_resource = np.dtype([("resource", np.ubyte, 1)])
+C:\Anaconda3\envs\ner\lib\runpy.py:125: RuntimeWarning: 'tf2onnx.convert' found in sys.modules after import of package 'tf2onnx', but prior to execution of 'tf2onnx.convert'; this may result in unpredictable behaviour
+  warn(RuntimeWarning(msg))
+2023-06-28 21:28:10,189 - INFO - Using tensorflow=1.13.1, onnx=1.14.0, tf2onnx=1.14.0/8f8d49
+2023-06-28 21:28:10,190 - INFO - Using opset <onnx, 15>
+2023-06-28 21:28:10,568 - INFO - Computed 0 values for constant folding
+2023-06-28 21:28:10,982 - ERROR - Tensorflow op [projection/cond_2/sub/Switch: Switch] is not supported
+2023-06-28 21:28:10,983 - ERROR - Tensorflow op [projection/cond_2/Slice/Switch: Switch] is not supported
+2023-06-28 21:28:10,986 - ERROR - Tensorflow op [projection/cond_2/ExpandDims_1/Switch: Switch] is not supported
+2023-06-28 21:28:11,010 - ERROR - Unsupported ops: Counter({'Switch': 3})
+2023-06-28 21:28:11,031 - INFO - Optimizing ONNX model
+2023-06-28 21:28:11,955 - INFO - After optimization: Cast -12 (38->26), Concat -3 (12->9), Const -118 (154->36), Expand -2 (6->4), Gather +2 (3->5), Identity -19 (19->0), Reshape -9 (16->7), Squeeze -5 (11->6), Transpose -3 (9->6), Unsqueeze -9 (18->9)
+2023-06-28 21:28:11,995 - INFO - 
+2023-06-28 21:28:11,995 - INFO - Successfully converted TensorFlow model model.ckpt.batch8.meta to ONNX
+2023-06-28 21:28:11,996 - INFO - Model inputs: ['inputs_seq:0', 'inputs_seq_len:0']
+2023-06-28 21:28:11,996 - INFO - Model outputs: ['projection/transitions:0', 'projection/Softmax:0', 'projection/cond_2/ReverseSequence_1:0']
+2023-06-28 21:28:11,996 - INFO - ONNX model is saved at model.onnx
+```
+
+`Switch] is not supported` 估计是因为 crf 解码时有个条件判断.
+
+
+然后用 ONNX 推理就会报错, 加载模型时就出错了.
+
+```log
+Traceback (most recent call last):
+  File ".\predict.py", line 4, in <module>
+    session = onnxruntime.InferenceSession('./ckpt/model.onnx')
+  File "C:\Anaconda3\envs\ner\lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 360, in __init__
+    self._create_inference_session(providers, provider_options, disabled_optimizers)
+  File "C:\Anaconda3\envs\ner\lib\site-packages\onnxruntime\capi\onnxruntime_inference_collection.py", line 397, in _create_inference_session
+    sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
+onnxruntime.capi.onnxruntime_pybind11_state.InvalidGraph: [ONNXRuntimeError] : 10 : INVALID_GRAPH : Load model from ./ckpt/model.onnx failed:This is an invalid model. In Node, ("projection/cond_2/ExpandDims_1/Switch", Switch, "", -1) : ("projection/transitions:0": tensor(float),"projection/Equal_2:0": tensor(bool),) -> ("projection/cond_2/ExpandDims_1/Switch:0","projection/cond_2/ExpandDims_1/Switch:1",) , Error No Op registered for Switch with domain_version of 15
+```

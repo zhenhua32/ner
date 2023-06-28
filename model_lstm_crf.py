@@ -48,6 +48,9 @@ class MyModel(object):
                 )
                 preds_seq, crf_scores = tf.contrib.crf.crf_decode(logits_seq, transition_matrix, self.inputs_seq_len)
 
+        print("probs_seq", probs_seq.shape)
+        print("preds_seq", preds_seq.shape)
+
         # 输出结果
         self.outputs = preds_seq
 

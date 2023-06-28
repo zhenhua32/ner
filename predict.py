@@ -2,7 +2,6 @@ import onnxruntime
 import numpy as np
 
 session = onnxruntime.InferenceSession('./ckpt/model.onnx')
-# outputs = session.run([output names], inputs)
 
 for name_and_shape in session.get_inputs():
     print(name_and_shape)

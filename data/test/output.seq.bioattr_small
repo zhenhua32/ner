@@ -1,0 +1,100 @@
+B-品牌 I-品牌 O O O O O O O O O O O O O O B-品类 I-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-品牌 I-品牌 O O O O O O O O O O O O O O
+O O O O O O B-品牌 I-品牌 I-品牌 I-品牌 B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O B-功效 I-功效 O O O B-功效 I-功效 O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O O O O O B-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 I-品牌 O B-品类 I-品类 I-品类 I-品类 I-品类 O B-适用人群 O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 B-品类 I-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O B-包装单位 I-包装单位 O B-品牌 I-品牌 O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O B-类型 I-类型 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O O O O O O O O O O O O O O O B-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 B-品牌 I-品牌 O O O O O O B-机芯类型 I-机芯类型 I-机芯类型 I-机芯类型 O O O O O O O O O O O O O O O O O O O O O
+O O O O B-类型 I-类型 I-类型 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O O O O O O O O O O O O B-类型 I-类型 I-类型 I-类型 O O O O O B-类型 I-类型 I-类型 I-类型 O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O O O O O O O O O O O B-品类 I-品类 O O O O O O O O O O O O O O O
+O O O O O B-面料 I-面料 O O O O B-裤型 I-裤型 I-裤型 O O O B-品类 I-品类 I-品类 O O O B-裤型 I-裤型 I-裤型 O O O O O O O O O B-品类 I-品类 I-品类 O O O O B-裤长类型 I-裤长类型 O O O O O O O O O O O O O O O O O
+O O O O O O O O O B-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O B-品类 I-品类 O O O O O O O O O B-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O B-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O B-适用场景 I-适用场景 B-品类 I-品类 I-品类 O O O O O O O O O O B-材质 I-材质 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O O O O O O O O B-品牌 I-品牌 O O O O O O O O O O B-品类 I-品类 O O O O O O O O O O B-颜色 I-颜色 I-颜色 O O O O B-运行内存 I-运行内存 I-运行内存 O O O O O O O O O O O
+B-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O B-品类 I-品类 O O O O O B-风格 I-风格 I-风格 I-风格 O O O O O O O O O O O O O O O O O O O O O O B-颜色 I-颜色
+B-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 I-品牌 O O O O O B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O O B-原产地 I-原产地 O O O O O B-国产/进口 I-国产/进口 O O O O O O O O B-类型 I-类型 I-类型 I-类型 O O O O O O O
+B-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 O B-类型 I-类型 I-类型 I-类型 I-类型 B-适用场景 I-适用场景 O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O B-品牌 I-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O O B-功效 I-功效 O O O O O O O O O O O O O O O O O O
+O O O O B-品类 I-品类 I-品类 O O O O O B-风格 I-风格 I-风格 O O O O O O O O O O O O O O O O O B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O O O O O O B-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O B-风格 I-风格 O O B-衣长类型 I-衣长类型 O O O O B-领型 I-领型 O O O O O O B-袖型 I-袖型 I-袖型 B-品类 I-品类 O O O O O O O O O O O B-品类 I-品类 O O O O O O O O O O O
+O O O O O O O O O O O O O O O O O O O O O O O O B-品类 I-品类 I-品类 O O O O O O O O O O O O O
+B-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-风格 I-风格 I-风格 O O O O O
+O O O O O O O B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 O O O O O O O B-光圈 I-光圈 I-光圈 I-光圈 O O O O O O O O B-品类 I-品类 O O B-适用机型 I-适用机型 O O O O O O O
+O O O O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 B-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-原产地 I-原产地 B-国产/进口 I-国产/进口 B-品类 I-品类 O O B-国产/进口 I-国产/进口 B-品类 I-品类 O O O O O O O B-品类 I-品类 O O O O O O O O B-类型 I-类型 I-类型 B-容量 I-容量 I-容量 I-容量 I-容量 O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 I-品牌 B-品类 I-品类 I-品类 I-品类 B-适用性别 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 O O O O B-款式 I-款式 O O O O O O O O O O O O O O O O O O O O O O O O O O B-尺码 I-尺码
+B-品牌 I-品牌 I-品牌 B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O O O O O O O O O O O B-适用人群 O O O O O O O O O O O O B-适用人群 O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O
+O O O O O O O O B-品类 I-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O B-颜色 I-颜色 O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O B-类型 I-类型 I-类型 I-类型 O O O O O O O O O O O O O O O O O O O B-品类 I-品类 I-品类 O O O O O O B-品类 I-品类 I-品类 O O O B-类型 I-类型 I-类型 I-类型 O O
+B-品牌 I-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O B-原产地 I-原产地 O B-品类 I-品类 O O O B-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O O O O O O O B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O O O O O O O O O O O B-品类 I-品类 O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O B-品类 I-品类 I-品类 B-类型 I-类型 O B-适用场景 I-适用场景 I-适用场景 I-适用场景 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-类型 I-类型 O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O B-材质 O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 B-品类 I-品类 I-品类 O O O O O O B-款式 I-款式 B-闭合方式 I-闭合方式 O O O O O O O O O O O O O O O O B-尺码 I-尺码
+B-品类 I-品类 O O O O O O B-适用季节 I-适用季节 O O O O O O O O O O B-品类 I-品类 B-图案 I-图案 O O B-适用场景 I-适用场景 O O O O O O O O O O O B-尺码 I-尺码 I-尺码
+O O O O O B-鞋跟形状 I-鞋跟形状 I-鞋跟形状 B-鞋跟高度 I-鞋跟高度 I-鞋跟高度 I-鞋跟高度 I-鞋跟高度 I-鞋跟高度 I-鞋跟高度 I-鞋跟高度 I-鞋跟高度 I-鞋跟高度 O O O O O O O O O O O O B-尺码 I-尺码
+B-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 O B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O B-品类 I-品类 I-品类 O O O O O B-鞋帮高度 I-鞋帮高度 O O O O O B-图案 I-图案 O O O O O O O O O O O B-尺码 I-尺码
+B-品牌 I-品牌 O O O O O O O O O O O O O O O O B-图案 I-图案 O O O O O O O O O O O O O O O O O B-尺码
+B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O B-闭合方式 I-闭合方式 O O O O O O B-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-颜色 I-颜色 O O O O O O O O O O O O O O B-尺码 I-尺码
+B-品牌 I-品牌 I-品牌 O O O O O O B-品类 I-品类 O O O O O O O O O B-适用季节 I-适用季节 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O B-品牌 I-品牌 I-品牌 B-品类 I-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-类型 I-类型 I-类型 I-类型 O O O O O O O O O O O O O O O O O O O B-品类 I-品类 I-品类 I-品类
+B-品牌 I-品牌 I-品牌 O O O O O O O O O O O O B-衣长类型 I-衣长类型 I-衣长类型 O O O O O O O O O O O O O O O O O O O O O O O B-尺码
+B-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-尺码 I-尺码
+O O O O O O O O O O O O O O O O O O B-图案 I-图案 B-裤型 I-裤型 I-裤型 O O O O O O O O O O O O O O O O O O O O O O B-套装类型 I-套装类型 I-套装类型 O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O O O O O O O O O O O O O B-功效 I-功效 O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O B-流行元素 I-流行元素 O O O O O O O O O O O O O O B-厚度 I-厚度 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O B-镜片材质 I-镜片材质 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 B-适用性别 I-适用性别 O B-鞋跟形状 I-鞋跟形状 O O O O O O O O O O B-适用季节 I-适用季节 O O O B-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-鞋跟形状 I-鞋跟形状 O O O O O O O O
+B-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O B-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O B-品类 I-品类 O O O O O O O O O O O O B-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 B-品类 I-品类 I-品类 O O O O O O O B-软硬度 O O B-材质 I-材质 O O O O O O O O
+O O O B-品类 I-品类 I-品类 I-品类 O O O O O O O O O O O O O B-形状 I-形状 O O B-品类 I-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O B-衣长类型 I-衣长类型 I-衣长类型 O O O O O O O O O O O O O O O B-适用人群 I-适用人群 O O O O O O O B-领型 I-领型 O O O B-尺码 I-尺码 I-尺码 I-尺码 I-尺码 I-尺码 I-尺码
+B-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 B-品类 I-品类 I-品类 I-品类 O O B-适用手机品牌 I-适用手机品牌 I-适用手机品牌 I-适用手机品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-适用手机品牌 I-适用手机品牌 I-适用手机品牌 I-适用手机品牌 O O O O O O O O O O
+O O O O O O B-品牌 I-品牌 I-品牌 I-品牌 O O B-品类 I-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O B-品类 I-品类 I-品类 O O O O O O O O
+B-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O B-品牌 I-品牌 O O B-品类 I-品类 I-品类 I-品类 I-品类 O O O O O
+O O O O O O O O B-款式 I-款式 I-款式 O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O B-光源类型 I-光源类型 I-光源类型 B-品类 I-品类 I-品类 O O O O B-适用场景 I-适用场景 O O B-光源类型 I-光源类型 I-光源类型 O O O O O O O O O O O O O O O O O O O O O B-光源类型 I-光源类型 I-光源类型 O O
+O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-驱动方式 I-驱动方式 I-驱动方式 O O O
+B-品牌 I-品牌 O O O B-材质 I-材质 O O O O O O O O O O O B-品类 I-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O B-型号 I-型号 I-型号 I-型号 I-型号 I-型号 O O B-品类 I-品类 I-品类 I-品类 O O O O O O O O O O O O O O O B-型号 I-型号 I-型号 I-型号 I-型号 I-型号 O O O O
+O O O O O O O O O O O O O O O O O O O O O B-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O B-颜色 I-颜色 O O O O
+B-品牌 I-品牌 I-品牌 O O O B-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O B-品类 I-品类 O O O O O O O O O O
+O O O O O O O O O O O O O O O O O B-品类 I-品类 I-品类 O O O O O O O O O O
+B-品牌 I-品牌 O O O B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-品类 I-品类 I-品类
+O O B-类型 I-类型 I-类型 O O O O O B-品类 I-品类 I-品类 O O B-风格 I-风格 O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O B-品类 I-品类 I-品类 O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O O O O O O B-品类 I-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 B-款式细节 I-款式细节 I-款式细节 B-类型 I-类型 I-类型 O O O O O O O O O O O O O O O O O O O O O O B-厚度 I-厚度 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O B-品牌 I-品牌 I-品牌 I-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 O O O O O O O O O B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O B-风格 I-风格 O O O O O O O B-款式 I-款式 I-款式 O O O O O O O O O O O
+B-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+B-品牌 I-品牌 I-品牌 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O O O O B-品类 I-品类 I-品类 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
+O O O B-材质 I-材质 I-材质 O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O O
