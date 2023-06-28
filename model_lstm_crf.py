@@ -36,13 +36,14 @@ class MyModel(object):
         with tf.variable_scope("projection"):
             # 回归到 vocab_size_bio 的维度
             logits_seq = tf.layers.dense(rnn_outputs, vocab_size_bio)  # B * S * V
-            # 加个 softmax
+            # 加个 softmax. probs_seq 的 shape 是 (batch_size, max_seq_len, vocab_size_bio)
             probs_seq = tf.nn.softmax(logits_seq)
 
             # 是否使用 crf
             if not use_crf:
                 preds_seq = tf.argmax(probs_seq, axis=-1, name="preds_seq")  # B * S
             else:
+                # transition_matrix 的 shape 是 (num_tags, num_tags)
                 log_likelihood, transition_matrix = tf.contrib.crf.crf_log_likelihood(
                     logits_seq, self.outputs_seq, self.inputs_seq_len
                 )

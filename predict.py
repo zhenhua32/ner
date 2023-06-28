@@ -15,7 +15,8 @@ input_data = {
     ], dtype=np.int32),
     "inputs_seq_len:0": np.array([5, 5], dtype=np.int32)
 }
-output_names = ["projection/transitions:0", "projection/Softmax:0", "projection/cond_2/ReverseSequence_1:0"]
+# output_names = ["projection/transitions:0", "projection/Softmax:0", "projection/cond_2/ReverseSequence_1:0"]
+output_names = ["projection/transitions:0", "projection/Softmax:0", "projection/cond_1/Merge:0"]
 
 for key, val in input_data.items():
     print(key, val.shape)
@@ -23,5 +24,5 @@ print("=====输出")
 output_data = session.run(output_names, input_data)
 print(output_data)
 print(len(output_data))
-print(output_data[0].shape)
-print(output_data[1].shape)
+for name, val in zip(output_names, output_data):
+    print(name, val.shape)

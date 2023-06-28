@@ -48,7 +48,7 @@ python -m tf2onnx.convert --checkpoint model.ckpt.batch8.meta --output model.onn
 
 python -m tf2onnx.convert --checkpoint model.ckpt.batch8.meta --output model.onnx --inputs inputs_seq:0,inputs_seq_len:0 --outputs projection/dense/bias:0,projection/transitions:0
 
-python -m tf2onnx.convert --checkpoint model.ckpt.batch8.meta --output model.onnx --inputs inputs_seq:0,inputs_seq_len:0 --outputs projection/transitions:0,projection/Softmax:0,projection/cond_2/ReverseSequence_1:0
+python -m tf2onnx.convert --checkpoint model.ckpt.batch8.meta --output model.onnx --inputs inputs_seq:0,inputs_seq_len:0 --outputs projection/transitions:0,projection/Softmax:0,projection/cond_2/ReverseSequence:0
 ```
 
 环境变量 LD_LIBRARY_PATH 是动态库查找的路径.
@@ -95,7 +95,7 @@ C:\Anaconda3\envs\ner\lib\runpy.py:125: RuntimeWarning: 'tf2onnx.convert' found 
 2023-06-28 21:28:11,010 - ERROR - Unsupported ops: Counter({'Switch': 3})
 2023-06-28 21:28:11,031 - INFO - Optimizing ONNX model
 2023-06-28 21:28:11,955 - INFO - After optimization: Cast -12 (38->26), Concat -3 (12->9), Const -118 (154->36), Expand -2 (6->4), Gather +2 (3->5), Identity -19 (19->0), Reshape -9 (16->7), Squeeze -5 (11->6), Transpose -3 (9->6), Unsqueeze -9 (18->9)
-2023-06-28 21:28:11,995 - INFO - 
+2023-06-28 21:28:11,995 - INFO -
 2023-06-28 21:28:11,995 - INFO - Successfully converted TensorFlow model model.ckpt.batch8.meta to ONNX
 2023-06-28 21:28:11,996 - INFO - Model inputs: ['inputs_seq:0', 'inputs_seq_len:0']
 2023-06-28 21:28:11,996 - INFO - Model outputs: ['projection/transitions:0', 'projection/Softmax:0', 'projection/cond_2/ReverseSequence_1:0']
@@ -103,7 +103,6 @@ C:\Anaconda3\envs\ner\lib\runpy.py:125: RuntimeWarning: 'tf2onnx.convert' found 
 ```
 
 `Switch] is not supported` 估计是因为 crf 解码时有个条件判断.
-
 
 然后用 ONNX 推理就会报错, 加载模型时就出错了.
 
@@ -117,3 +116,124 @@ Traceback (most recent call last):
     sess = C.InferenceSession(session_options, self._model_path, True, self._read_config_from_model)
 onnxruntime.capi.onnxruntime_pybind11_state.InvalidGraph: [ONNXRuntimeError] : 10 : INVALID_GRAPH : Load model from ./ckpt/model.onnx failed:This is an invalid model. In Node, ("projection/cond_2/ExpandDims_1/Switch", Switch, "", -1) : ("projection/transitions:0": tensor(float),"projection/Equal_2:0": tensor(bool),) -> ("projection/cond_2/ExpandDims_1/Switch:0","projection/cond_2/ExpandDims_1/Switch:1",) , Error No Op registered for Switch with domain_version of 15
 ```
+
+# 用 numpy 实现 crf decode
+
+您好，感谢您使用必应搜索。根据您的搜索词，我为您找到了以下信息：
+
+## numpy crf decode
+
+numpy crf decode 是指在 numpy 中使用条件随机场（CRF）模型进行序列标注任务的解码过程。CRF 是一种概率图模型，可以用于建模序列数据的条件概率分布 ¹。
+
+要在 numpy 中实现 crf decode，有以下几个步骤：
+
+- 步骤一：定义 CRF 模型的参数。CRF 模型的参数包括状态特征权重矩阵 W 和转移特征权重矩阵 T。W 的形状为 (n_states, n_features)，T 的形状为 (n_states, n_states)。例如：
+
+```python
+import numpy as np
+n_states = 3 # number of possible tags
+n_features = 4 # number of input features
+W = np.random.randn(n_states, n_features) # state feature weights
+T = np.random.randn(n_states, n_states) # transition feature weights
+```
+
+- 步骤二：定义输入序列的特征矩阵 X 和真实标签序列 y。X 的形状为 (n_steps, n_features)，y 的形状为 (n_steps,)。例如：
+
+```python
+n_steps = 5 # length of the input sequence
+X = np.random.randn(n_steps, n_features) # input feature matrix
+y = np.array([0, 1, 2, 1, 0]) # true label sequence
+```
+
+- 步骤三：定义 Viterbi 算法的函数。Viterbi 算法是一种动态规划算法，可以用于寻找最可能的标签序列 ²。Viterbi 算法的函数接受 W，T 和 X 作为输入，返回最优标签序列 y_pred 和最大对数似然值 score。例如：
+
+```python
+def viterbi_decode(W, T, X):
+    n_steps, n_features = X.shape
+    n_states = W.shape[0]
+    # Initialize the score matrix and the backpointer matrix
+    score = np.zeros((n_steps, n_states))
+    backpointer = np.zeros((n_steps, n_states), dtype=np.int32)
+    # Compute the score and the backpointer for the first step
+    score[0] = W.dot(X[0])
+    backpointer[0] = -1
+    # Loop over the remaining steps
+    for i in range(1, n_steps):
+        # Compute the score and the backpointer for the current step
+        score[i] = W.dot(X[i]) + T + score[i-1][:, None]
+        backpointer[i] = np.argmax(score[i], axis=0)
+        # Normalize the score to avoid numerical issues
+        score[i] -= np.max(score[i])
+    # Trace back the optimal path from the last step
+    y_pred = np.zeros(n_steps, dtype=np.int32)
+    y_pred[-1] = np.argmax(score[-1])
+    for i in range(n_steps-2, -1, -1):
+        y_pred[i] = backpointer[i+1][y_pred[i+1]]
+    # Return the optimal path and the maximum log-likelihood
+    return y_pred, np.max(score[-1])
+```
+
+- 步骤四：调用 Viterbi 算法的函数，得到最优标签序列 y_pred 和最大对数似然值 score。例如：
+
+```python
+y_pred, score = viterbi_decode(W, T, X)
+print(y_pred)
+print(score)
+```
+
+以下是一些相关的网页链接：
+
+- [NumPy decode() function - Studytonight](https://www.studytonight.com/numpy/numpy-decode-function)
+- [numpy.char.decode — NumPy v1.25 Manual](https://numpy.org/doc/stable/reference/generated/numpy.char.decode.html)
+- [numpy.chararray.decode — NumPy v1.25 Manual](https://numpy.org/doc/stable/reference/generated/numpy.chararray.decode.html)
+- [条件随机场（CRF）原理及应用 - CSDN 博客](https://blog.csdn.net/qq_16234613/article/details/79451511)
+- [Viterbi 算法详解 - CSDN 博客](https://blog.csdn.net/qq_19707521/article/details/78479532)
+
+希望这些信息对您有帮助。如果您还有其他问题，欢迎继续使用必应搜索。😊
+
+源: 与必应的对话， 2023/6/28
+(1) numpy.char.decode — NumPy v1.25 Manual. https://numpy.org/doc/stable/reference/generated/numpy.char.decode.html.
+(2) numpy.chararray.decode — NumPy v1.25 Manual. https://numpy.org/doc/stable/reference/generated/numpy.chararray.decode.html.
+(3) NumPy decode() function - Studytonight. https://www.studytonight.com/numpy/numpy-decode-function.
+
+# spark --archives
+
+您好，感谢您使用必应搜索。根据您的搜索词，我为您找到了以下信息：
+
+## pyspark --archives
+
+pyspark --archives 是指在提交 pyspark 作业时，使用 --archives 参数来传递一些压缩文件，这些文件会被解压到每个执行器的工作目录中。支持的压缩文件格式有 .jar, .tar.gz, .tgz 和 .zip。您可以通过在文件名后加 # 来指定解压后的目录名，例如 file.zip#directory。这个参数是实验性的，自 Spark 3.1.0 版本开始支持 ¹。
+
+要在 pyspark 中获取 --archives 传过来的文件的路径，有以下几种方法：
+
+- 方法一：使用 SparkFiles 模块来获取文件的绝对路径。SparkFiles 模块提供了一个 get () 函数，可以根据文件名或目录名来返回文件的绝对路径 ²。例如：
+
+```python
+from pyspark import SparkFiles
+# Suppose we submit the job with --archives file.zip#directory
+file_path = SparkFiles.get("file.zip") # get the path of the zip file
+dir_path = SparkFiles.get("directory") # get the path of the unzipped directory
+```
+
+- 方法二：使用 os 模块来获取文件的相对路径。os 模块提供了一个 getcwd () 函数，可以返回当前工作目录的路径 ³。例如：
+
+```python
+import os
+# Suppose we submit the job with --archives file.zip#directory
+cwd = os.getcwd() # get the current working directory
+file_path = os.path.join(cwd, "file.zip") # get the relative path of the zip file
+dir_path = os.path.join(cwd, "directory") # get the relative path of the unzipped directory
+```
+
+以下是一些相关的网页链接：
+
+- [Configuration - Spark 3.4.1 Documentation - Apache Spark](https://spark.apache.org/docs/latest/configuration.html)
+- [What's the difference between --archives, --files, py-files in pyspark ...](https://stackoverflow.com/questions/38066318/whats-the-difference-between-archives-files-py-files-in-pyspark-job-argum)
+- [PySpark Archives - Spark By {Examples}](https://sparkbyexamples.com/category/pyspark/)
+
+希望这些信息对您有帮助。如果您还有其他问题，欢迎继续使用必应搜索。😊
+
+源: 与必应的对话， 2023/6/28
+(1) What's the difference between --archives, --files, py-files in pyspark .... https://stackoverflow.com/questions/38066318/whats-the-difference-between-archives-files-py-files-in-pyspark-job-argum.
+(2) Configuration - Spark 3.4.1 Documentation - Apache Spark. https://spark.apache.org/docs/latest/configuration.html.
+(3) PySpark Archives - Spark By {Examples}. https://sparkbyexamples.com/category/pyspark/.

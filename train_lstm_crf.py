@@ -33,16 +33,16 @@ logger.info("loading data...")
 
 # 输入文件是分成两个的, 一个是输入序列, 一个是输出序列
 data_processor_train = DataProcessor(
-    "./data/train/input.seq.char",
-    "./data/train/output.seq.bioattr",
+    "./data/train/input.seq.char_small",
+    "./data/train/output.seq.bioattr_small",
     w2i_char,
     w2i_bio,
     shuffling=True,
 )
 
 data_processor_valid = DataProcessor(
-    "./data/test/input.seq.char",
-    "./data/test/output.seq.bioattr",
+    "./data/test/input.seq.char_small",
+    "./data/test/output.seq.bioattr_small",
     w2i_char,
     w2i_bio,
     shuffling=True,
@@ -82,15 +82,21 @@ with tf.Session(config=tf_config) as sess:
     losses = []
     batches = 0
     best_f1 = 0
-    batch_size = 32
+    batch_size = 1
 
-    while epoches < 20:
+    while epoches < 2:
         # 获取这一批次的数据
         (
             inputs_seq_batch,
             inputs_seq_len_batch,
             outputs_seq_batch,
         ) = data_processor_train.get_batch(batch_size)
+
+        print(inputs_seq_batch)  # (batch_size, seq_len)
+        print(inputs_seq_len_batch)  # (batch_size,)
+        print(outputs_seq_batch)  # (batch_size, seq_len)
+        print(outputs_seq_batch.shape)
+        exit()
 
         # 模型的输入字典
         feed_dict = {
@@ -181,7 +187,7 @@ with tf.Session(config=tf_config) as sess:
 
             return (p, r, f1)
 
-        if batches % 100 == 0:
+        if batches % 1 == 0:
             logger.info("")
             logger.info("Epoches: {}".format(epoches))
             logger.info("Batches: {}".format(batches))
