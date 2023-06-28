@@ -16,7 +16,7 @@ input_data = {
     ], dtype=np.int32),
     "inputs_seq_len:0": np.array([5, 5], dtype=np.int32)
 }
-output_names = ["projection/transitions:0", "projection/Softmax:0"]
+output_names = ["projection/transitions:0", "projection/Softmax:0", "projection/cond_2/ReverseSequence_1:0"]
 
 for key, val in input_data.items():
     print(key, val.shape)
