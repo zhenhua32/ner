@@ -46,7 +46,7 @@
 ```bash
 python -m tf2onnx.convert --checkpoint model.ckpt.batch8.meta --output model.onnx --inputs inputs_seq:0,inputs_seq_len:0 --outputs projection/dense/kernel:0
 
-python -m tf2onnx.convert --checkpoint model.ckpt.batch8.meta --output model.onnx --inputs inputs_seq:0,inputs_seq_len:0 --outputs projection/dense/bias:0,projection/transitions:0
+python -m tf2onnx.convert --checkpoint model.ckpt.batch8.meta --output model.onnx --inputs inputs_seq:0,inputs_seq_len:0 --outputs projection/dense/BiasAdd:0,projection/Softmax:0,projection/transitions:0
 
 python -m tf2onnx.convert --checkpoint model.ckpt.batch8.meta --output model.onnx --inputs inputs_seq:0,inputs_seq_len:0 --outputs projection/transitions:0,projection/Softmax:0,projection/cond_2/ReverseSequence:0
 ```
@@ -237,3 +237,60 @@ dir_path = os.path.join(cwd, "directory") # get the relative path of the unzippe
 (1) What's the difference between --archives, --files, py-files in pyspark .... https://stackoverflow.com/questions/38066318/whats-the-difference-between-archives-files-py-files-in-pyspark-job-argum.
 (2) Configuration - Spark 3.4.1 Documentation - Apache Spark. https://spark.apache.org/docs/latest/configuration.html.
 (3) PySpark Archives - Spark By {Examples}. https://sparkbyexamples.com/category/pyspark/.
+
+# pip list
+
+```
+Package              Version
+-------------------- ---------
+absl-py              1.4.0
+appdirs              1.4.3
+astor                0.8.1
+attrs                23.1.0
+black                19.10b0
+certifi              2022.12.7
+charset-normalizer   3.1.0
+click                8.1.3
+colorama             0.4.6
+coloredlogs          15.0.1
+flake8               3.7.9
+flatbuffers          2.0.7
+gast                 0.5.4
+grpcio               1.56.0
+h5py                 3.8.0
+humanfriendly        10.0
+idna                 3.4
+importlib-metadata   6.7.0
+Keras-Applications   1.0.8
+Keras-Preprocessing  1.1.2
+Markdown             3.4.3
+MarkupSafe           2.1.3
+mock                 5.0.2
+mpmath               1.3.0
+numpy                1.21.6
+onnx                 1.14.0
+onnxruntime          1.14.1
+packaging            23.1
+pathspec             0.7.0
+pip                  22.3.1
+protobuf             3.20.0
+pyreadline           2.1
+regex                2020.2.20
+requests             2.31.0
+setuptools           65.6.3
+six                  1.16.0
+sympy                1.10.1
+tensorboard          1.13.1
+tensorflow           1.13.1
+tensorflow-estimator 1.13.0
+termcolor            2.3.0
+tf2onnx              1.14.0
+toml                 0.10.0
+typed-ast            1.4.1
+typing_extensions    4.6.3
+urllib3              2.0.3
+Werkzeug             2.2.3
+wheel                0.38.4
+wincertstore         0.2
+zipp                 3.15.0
+```

@@ -73,7 +73,7 @@ def viterbi_decode(score, transition_params):
 
 
 # y_pred, score = viterbi_decode(W, T, X)
-# 这个解码每个序列的, 所以 X 的 shape 是 (序列长, 标签数)
+# 这个解码每个序列的, 所以 X 的 shape 是 (序列长, 标签数). T 的 shape 是 (标签数, 标签数)
 X = np.random.randn(n_steps, n_states)
 y_pred, score = viterbi_decode(X, T)
 print(y_pred)
